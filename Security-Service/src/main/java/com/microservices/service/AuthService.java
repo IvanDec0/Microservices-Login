@@ -23,8 +23,13 @@ public class AuthService {
     private final JwtService jwtService;
 
     public String register(RegisterRequest request){
+        if (!(request.getEmail().isEmpty()) && repository.existsByEmail(request.getEmail())){
+            return "There is already an account registered with the same email";
+        }
         List<Rol> roles = new ArrayList<>() {{
-            add(rolRepository.findByName("ROLE_" + (request.getRole()).toUpperCase())); // TODO: VER BUG ROL NO EXISTENTE CRAHSEA
+            if (rolRepository.existsByName("ROLE_" + (request.getRole()).toUpperCase())){
+                add(rolRepository.findByName("ROLE_" + (request.getRole()).toUpperCase()));
+            }
             add(rolRepository.findByName("ROLE_USER"));
         }};
         var user = UserCredential.builder()
@@ -34,7 +39,6 @@ public class AuthService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(roles)
                 .active(true)
-
                 .build();
         repository.save(user);
         return "User registered successfully";
@@ -46,5 +50,9 @@ public class AuthService {
 
     public void validateToken(String token) {
         jwtService.validateToken(token);
+    }
+
+    public UserCredential findUserByEmail(String email) {
+        return repository.findByEmail(email);
     }
 }
