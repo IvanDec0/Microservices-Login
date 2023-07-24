@@ -1,0 +1,23 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: security-service
+          uri: lb://SECURITY-SERVICE
+          predicates:
+            - Path=/auth/**
+
+  application:
+    name: API-GATEWAY
+
+eureka:
+  client:
+    service-url:
+      defaultZone : http://localhost:8761/eureka/
+
+logging:
+  level:
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE

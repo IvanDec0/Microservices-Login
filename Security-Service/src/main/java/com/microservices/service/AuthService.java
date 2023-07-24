@@ -9,8 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.Arrays.stream;
 
 
 @Service
@@ -41,18 +43,18 @@ public class AuthService {
                 .active(true)
                 .build();
         repository.save(user);
-        return "User registered successfully";
+        return generateToken(user.getEmail());
+        //return "User registered successfully";
     }
 
     public String generateToken(String email){
-        return jwtService.generateToken(email);
+        Optional<UserCredential> user = repository.findByEmail(email);
+        List<String> roles = user.get().getRoles().stream().map(Rol::getName).collect(Collectors.toList());
+        return jwtService.generateToken(email,roles);
     }
 
     public void validateToken(String token) {
         jwtService.validateToken(token);
     }
 
-    public UserCredential findUserByEmail(String email) {
-        return repository.findByEmail(email);
-    }
 }

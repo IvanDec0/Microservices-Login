@@ -1,16 +1,17 @@
 package com.microservices.entity;
 
+import com.microservices.util.CreateRoles;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.antlr.v4.runtime.misc.NotNull;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "rol")
+@Table(name = "rol_user")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,4 +24,7 @@ public class Rol {
     @ManyToMany(mappedBy = "roles")
     private List<UserCredential> users;
 
+    public Rol(String name) {
+        this.name = name;
+    }
 }

@@ -2,6 +2,7 @@ package com.microservices.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +38,7 @@ public class UserCredential {
     @JoinTable(
             name = "users_roles",
             joinColumns = {@JoinColumn(name = "USER_ID", referencedColumnName = "ID")},
-            inverseJoinColumns = {@JoinColumn(name = "ROLE_ID", referencedColumnName = "ID")})
+            inverseJoinColumns = {@JoinColumn(name = "ROL_ID", referencedColumnName = "ID")})
     private List<Rol> roles = new ArrayList<>();
 
 }
