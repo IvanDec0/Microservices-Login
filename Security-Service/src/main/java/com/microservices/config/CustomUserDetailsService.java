@@ -2,6 +2,7 @@ package com.microservices.config;
 
 import com.microservices.entity.UserCredential;
 import com.microservices.repository.UserCredentialRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +13,7 @@ import java.util.Optional;
 @Component
 public class CustomUserDetailsService implements UserDetailsService {
 
+    @Autowired
     private UserCredentialRepository repository;
 
 

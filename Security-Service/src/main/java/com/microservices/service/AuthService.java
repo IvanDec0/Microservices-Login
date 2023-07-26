@@ -1,18 +1,23 @@
 package com.microservices.service;
 
+import com.microservices.dto.LoginRequest;
 import com.microservices.dto.RegisterRequest;
 import com.microservices.entity.Rol;
 import com.microservices.entity.UserCredential;
 import com.microservices.repository.RolRepository;
 import com.microservices.repository.UserCredentialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static java.util.Arrays.stream;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 
 @Service
@@ -23,6 +28,7 @@ public class AuthService {
     private final RolRepository rolRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public String register(RegisterRequest request){
         if (!(request.getEmail().isEmpty()) && repository.existsByEmail(request.getEmail())){
@@ -43,8 +49,17 @@ public class AuthService {
                 .active(true)
                 .build();
         repository.save(user);
-        return generateToken(user.getEmail());
-        //return "User registered successfully";
+        //return generateToken(user.getEmail());
+        return "User registered successfully";
+    }
+
+    public String login(LoginRequest user){
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+        if (authenticate.isAuthenticated()) {
+            return generateToken(user.getEmail());
+        } else {
+            throw new ResponseStatusException(UNAUTHORIZED, "check you credentials");
+        }
     }
 
     public String generateToken(String email){
