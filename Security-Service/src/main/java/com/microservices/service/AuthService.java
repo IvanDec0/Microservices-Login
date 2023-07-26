@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.security.SignatureException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,8 +69,15 @@ public class AuthService {
         return jwtService.generateToken(email,roles);
     }
 
-    public void validateToken(String token) {
-        jwtService.validateToken(token);
+    public String validateToken(String token) {
+        try {
+            jwtService.validateToken(token);
+            return "Valid token";
+        } catch (RuntimeException e){
+            return "Bad Signature";
+        }
+
+
     }
 
 }
