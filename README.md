@@ -13,10 +13,12 @@ D & F --> G
 classDiagram
 			AppUser--Role
       class AppUser{
-		      -int id
+		  -int id
           -String email
           -String name
+          -String lastname
           -String password
+          -Boolean active
 
       }
       class Role{
