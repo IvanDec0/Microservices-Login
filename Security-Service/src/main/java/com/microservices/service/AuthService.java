@@ -7,14 +7,14 @@ import com.microservices.entity.UserCredential;
 import com.microservices.repository.RolRepository;
 import com.microservices.repository.UserCredentialRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.security.SignatureException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,9 +31,23 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public String register(RegisterRequest request){
-        if (!(request.getEmail().isEmpty()) && repository.existsByEmail(request.getEmail())){
-            return "There is already an account registered with the same email";
+    public ResponseEntity<String> register(RegisterRequest request){
+
+        if(request.getEmail().isEmpty()){
+            return new ResponseEntity<>("Email is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if(request.getPassword().isEmpty()){
+            return new ResponseEntity<>("Password is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if(request.getName().isEmpty()){
+            return new ResponseEntity<>("Name is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if(request.getLastname().isEmpty()){
+            return new ResponseEntity<>("Lastname is mandatory", HttpStatus.BAD_REQUEST);
+        }
+
+        if (repository.existsByEmail(request.getEmail())){
+            return new ResponseEntity<>("There is already an account registered with the same email", HttpStatus.CONFLICT);
         }
         List<Rol> roles = new ArrayList<>() {{
             if (rolRepository.existsByName("ROLE_" + (request.getRole()).toUpperCase())){
@@ -51,15 +65,23 @@ public class AuthService {
                 .build();
         repository.save(user);
         //return generateToken(user.getEmail());
-        return "User registered successfully";
+        return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
     }
 
-    public String login(LoginRequest user){
+    public ResponseEntity<String> login(LoginRequest user){
+
+        if(user.getEmail().isEmpty()){
+            return new ResponseEntity<>("Email is mandatory", HttpStatus.BAD_REQUEST);
+        }
+        if(user.getPassword().isEmpty()){
+            return new ResponseEntity<>("Password is mandatory", HttpStatus.BAD_REQUEST);
+        }
+
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         if (authenticate.isAuthenticated()) {
-            return generateToken(user.getEmail());
+            return new ResponseEntity<>(generateToken(user.getEmail()), HttpStatus.OK);
         } else {
-            throw new ResponseStatusException(UNAUTHORIZED, "check you credentials");
+            return new ResponseEntity<>("Check you credentials", UNAUTHORIZED);
         }
     }
 
@@ -69,12 +91,15 @@ public class AuthService {
         return jwtService.generateToken(email,roles);
     }
 
-    public String validateToken(String token) {
+    public ResponseEntity<String> validateToken(String token) {
+        if(token.isEmpty()){
+            return new ResponseEntity<>("Token is mandatory", HttpStatus.BAD_REQUEST);
+        }
         try {
             jwtService.validateToken(token);
-            return "Valid token";
+            return new ResponseEntity<>("Valid token", HttpStatus.OK);
         } catch (RuntimeException e){
-            return "Bad Signature";
+            return new ResponseEntity<>("Bad Signature", UNAUTHORIZED);
         }
 
 

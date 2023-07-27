@@ -1,6 +1,5 @@
 package com.microservices.entity;
 
-import com.microservices.util.CreateRoles;
 import jakarta.persistence.*;
 import lombok.*;
 

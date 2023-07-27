@@ -3,7 +3,6 @@ package com.microservices.util;
 import com.microservices.entity.Rol;
 import com.microservices.repository.RolRepository;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,7 @@ public class CreateRoles implements CommandLineRunner {
 
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
  Rol rolAdmin = new Rol("ROLE_ADMIN");
  Rol rolUser = new Rol("ROLE_USER");
