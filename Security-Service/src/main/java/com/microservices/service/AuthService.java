@@ -53,7 +53,7 @@ public class AuthService {
                 .build();
         repository.save(user);
         //return generateToken(user.getEmail());
-        return new ResponseEntity<>("User registered successfully!", HttpStatus.OK);
+        return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
     }
 
     public ResponseEntity<String> login(LoginRequest user){
