@@ -7,13 +7,13 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="discovery-server" />
         <module name="Security-Service" />
-        <module name="ApiGateway" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="Api-Gateway" target="20" />
+      <module name="ApiGateway" target="20" />
+      <module name="discovery-server" target="20" />
       <module name="swiggy-gateway" target="20" />
     </bytecodeTargetLevel>
   </component>
