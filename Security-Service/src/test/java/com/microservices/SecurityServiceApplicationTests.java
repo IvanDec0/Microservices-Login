@@ -15,6 +15,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.CONFLICT;
@@ -35,10 +38,11 @@ class SecurityServiceApplicationTests {
         authService= new AuthService(userCredentialRepository, rolRepository, passwordEncoder, jwtService, authenticationManager);
     }
 
+    //private final ArrayList<String> roles = new ArrayList<String>(List.of("admin"));
     private final RegisterRequest some_valid_registration_request=new RegisterRequest(
             "Bruno", "Mollo",
             "someEmail@gmail.com",
-            "paSsWord123", "ADMIN");
+            "paSsWord123", (List.of("admin")));
 
     @Test
     void register_user_if_email_is_not_taken_and_input_is_valid(){
@@ -48,6 +52,7 @@ class SecurityServiceApplicationTests {
 
         verify(userCredentialRepository, times(1) ).save(any());
         assertEquals(response.getStatusCode(), CREATED);
+
     }
 
     @Test
