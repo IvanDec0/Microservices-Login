@@ -38,9 +38,11 @@ public class AuthService {
         }
 
         List<Rol> roles = new ArrayList<>() {{
-            if (rolRepository.existsByName("ROLE_" + (request.getRole()).toUpperCase())){
-                add(rolRepository.findByName("ROLE_" + (request.getRole()).toUpperCase()));
-            }
+            request.getRoles().forEach(role -> {
+                if (rolRepository.existsByName("ROLE_" + (role).toUpperCase())){
+                    add(rolRepository.findByName("ROLE_" + (role).toUpperCase()));
+            }});
+
             add(rolRepository.findByName("ROLE_USER"));
         }};
         var user = UserCredential.builder()

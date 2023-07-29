@@ -2,15 +2,16 @@ package com.microservices.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class RegisterRequest {
-
-    @NonNull private String name;
-    @NonNull private String lastname;
-    @NonNull private String email;
-    @NonNull private String password;
-    @NonNull private String role;
+    private String name;
+    private String lastname;
+    private String email;
+    private String password;
+    private List<String> roles;
 }
