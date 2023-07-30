@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 
 @Service
 @RequiredArgsConstructor
@@ -33,8 +31,8 @@ public class AuthService {
 
     public ResponseEntity<String> register(RegisterRequest request){
 
-        if(validations(request)!= null){
-            return validations(request);
+        if (repository.existsByEmail(request.getEmail())){
+            return new ResponseEntity<>("There is already an account registered with the same email", HttpStatus.CONFLICT);
         }
 
         List<Rol> roles = new ArrayList<>() {{
@@ -59,19 +57,11 @@ public class AuthService {
     }
 
     public ResponseEntity<String> login(LoginRequest user){
-
-        if(user.getEmail().isEmpty()){
-            return new ResponseEntity<>("Email is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(user.getPassword().isEmpty()){
-            return new ResponseEntity<>("Password is mandatory", HttpStatus.BAD_REQUEST);
-        }
-
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
         if (authenticate.isAuthenticated()) {
             return new ResponseEntity<>(generateToken(user.getEmail()), HttpStatus.OK);
         } else {
-            return new ResponseEntity<>("Check you credentials", UNAUTHORIZED);
+            return new ResponseEntity<>("Check you credentials", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -89,46 +79,7 @@ public class AuthService {
             jwtService.validateToken(token);
             return new ResponseEntity<>("Valid token", HttpStatus.OK);
         } catch (RuntimeException e){
-            return new ResponseEntity<>("Bad Signature", UNAUTHORIZED);
+            return new ResponseEntity<>("Bad Signature", HttpStatus.UNAUTHORIZED);
         }
-    }
-
-    private ResponseEntity<String> validations(RegisterRequest request){
-
-        if (repository.existsByEmail(request.getEmail())){
-            return new ResponseEntity<>("There is already an account registered with the same email", HttpStatus.CONFLICT);
-        }
-
-        if(request.getEmail().isEmpty()){
-            return new ResponseEntity<>("Email is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(request.getPassword().isEmpty()){
-            return new ResponseEntity<>("Password is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(request.getName().isEmpty()){
-            return new ResponseEntity<>("Name is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(request.getLastname().isEmpty()){
-            return new ResponseEntity<>("Lastname is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(!request.getEmail().matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")){
-            return new ResponseEntity<>("Invalid email", HttpStatus.BAD_REQUEST);
-        }
-        if(request.getPassword().length()>32){
-            return new ResponseEntity<>("Password max length is 32 chars", HttpStatus.BAD_REQUEST);
-        }
-        if(request.getPassword().length()<8){
-            return new ResponseEntity<>("Password min length is 8 chars", HttpStatus.BAD_REQUEST);
-        }
-        if(!request.getPassword().matches(".*[A-Z].*")){
-            return new ResponseEntity<>("At least one letter in uppercase is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(!request.getPassword().matches(".*[a-z].*")){
-            return new ResponseEntity<>("At least one letter in lowercase is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        if(!request.getPassword().matches(".*[0-9].*")){
-            return new ResponseEntity<>("At least one number is mandatory", HttpStatus.BAD_REQUEST);
-        }
-        return null;
     }
 }

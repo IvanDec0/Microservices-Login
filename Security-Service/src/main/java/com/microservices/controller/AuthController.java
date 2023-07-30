@@ -3,10 +3,10 @@ package com.microservices.controller;
 import com.microservices.dto.LoginRequest;
 import com.microservices.dto.RegisterRequest;
 import com.microservices.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,12 +16,12 @@ public class AuthController {
     private final AuthService service;
 
     @PostMapping("/register")
-    public ResponseEntity<String> addUser(@RequestBody @Validated RegisterRequest user) {
+    public ResponseEntity<String> addUser(@RequestBody @Valid RegisterRequest user) {
         return service.register(user);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody @Validated LoginRequest user) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest user) {
         return service.login(user);
     }
 
