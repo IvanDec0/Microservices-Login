@@ -18,9 +18,9 @@ public class CreateRoles implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
- Rol rolAdmin = new Rol("ROLE_ADMIN");
- Rol rolUser = new Rol("ROLE_USER");
- repository.save(rolAdmin);
- repository.save(rolUser);
+        Rol rolAdmin = new Rol("ROLE_ADMIN");
+        Rol rolUser = new Rol("ROLE_USER");
+        repository.save(rolAdmin);
+        repository.save(rolUser);
     }
 }

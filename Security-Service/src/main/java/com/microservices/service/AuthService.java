@@ -15,7 +15,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -29,17 +31,18 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public ResponseEntity<String> register(RegisterRequest request){
+    public ResponseEntity<String> register(RegisterRequest request) {
 
-        if (repository.existsByEmail(request.getEmail())){
+        if (repository.existsByEmail(request.getEmail())) {
             return new ResponseEntity<>("There is already an account registered with the same email", HttpStatus.CONFLICT);
         }
 
         List<Rol> roles = new ArrayList<>() {{
             request.getRoles().forEach(role -> {
-                if (rolRepository.existsByName("ROLE_" + (role).toUpperCase())){
+                if (rolRepository.existsByName("ROLE_" + (role).toUpperCase())) {
                     add(rolRepository.findByName("ROLE_" + (role).toUpperCase()));
-            }});
+                }
+            });
 
             add(rolRepository.findByName("ROLE_USER"));
         }};
@@ -56,29 +59,26 @@ public class AuthService {
         return new ResponseEntity<>("User registered successfully!", HttpStatus.CREATED);
     }
 
-    public ResponseEntity<String> login(LoginRequest user){
+    public ResponseEntity<String> login(LoginRequest user) {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
-        if (authenticate.isAuthenticated()) {
-            return new ResponseEntity<>(generateToken(user.getEmail()), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>("Check you credentials", HttpStatus.UNAUTHORIZED);
-        }
+        return new ResponseEntity<>(generateToken(user.getEmail()), HttpStatus.OK);
+
     }
 
-    public String generateToken(String email){
+    public String generateToken(String email) {
         Optional<UserCredential> user = repository.findByEmail(email);
         List<String> roles = user.get().getRoles().stream().map(Rol::getName).collect(Collectors.toList());
-        return jwtService.generateToken(email,roles);
+        return jwtService.generateToken(email, roles);
     }
 
     public ResponseEntity<String> validateToken(String token) {
-        if(token.isEmpty()){
+        if (token.isEmpty()) {
             return new ResponseEntity<>("Token is mandatory", HttpStatus.BAD_REQUEST);
         }
         try {
             jwtService.validateToken(token);
             return new ResponseEntity<>("Valid token", HttpStatus.OK);
-        } catch (RuntimeException e){
+        } catch (RuntimeException e) {
             return new ResponseEntity<>("Bad Signature", HttpStatus.UNAUTHORIZED);
         }
     }
